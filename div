@@ -1,0 +1,57 @@
+###Analyses of community composition
+
+#load packages
+require(vegan)
+require(recluster)
+require(raster)
+require(maps)
+
+#load species-by-site matrix
+spp  <- read.table('spp.txt', header = T, row.names = 1, sep = '')
+
+#exclude unicates
+uni <- apply(spp, 2, sum)
+spp <- spp[, which(uni > 1)]
+
+#Helling transformation of spp-by-site matrix
+spp.hel <- decostand(spp, 'hel')
+
+#Distance matrix for downstream analyses of community composition
+simdiss <- recluster.dist(spp.hel, dist = "simpson")
+
+#ordination analysis
+spp.ord <- metaMDS(simdiss, center = T)$points
+col <- as.data.frame(recluster.col(spp.ord))
+
+#extract colors for plots
+colnames(col) <- c('axis1', 'axis2', 'r', 'g', 'b')
+
+##plot ordination results
+tiff("nmds_map.tiff", height = 15, width = 30, unit = "cm", res = 600)
+par(mfrow = c(1, 2))
+plot(spp.ord, col = rgb(col$r, col$g, col$b, maxColorValue = 255), pch = 16)
+
+#fit environmental vectors
+fit <- envfit(spp.ord, environment)
+plot(fit, add = T, col = 'black')
+
+##map
+#ll  <- read.table('latlong.txt', header = T, row.names = 1, sep = '')
+
+#load Brazil's shapefile
+#brasil <- shapefile('Brasil')
+
+#plot geographical delimitation
+map(xlim = c(min(ll$Long10), max(ll$Long10)),
+	ylim = c(min(ll$Lat10), max(ll$Lat10)), col = "white")
+
+#plot shapefile and points
+plot(brasil, border = 'gray', add = T)
+points(ll$Long10, ll$Lat10, col = rgb(col$r, col$g, col$b,
+	maxColorValue = 255), pch = 16)
+#map.axes()
+
+#fit most explanatory environmental variable
+ordisurf(cbind(ll$Long10, ll$Lat10), environment$bio9, col = 'black', add = T)
+
+dev.off()

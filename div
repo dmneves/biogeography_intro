@@ -1,13 +1,19 @@
 ###Analyses of community composition
 
-#load packages
-require(vegan)
-require(recluster)
-require(raster)
-require(maps)
+##install packages
+install.packages(vegan)
+install.packages(raster)
 
-#load species-by-site matrix
-spp  <- read.table('spp.txt', header = T, row.names = 1, sep = '')
+##load packages
+require(vegan)
+require(raster)
+
+##load matrices
+#species-by-site
+spp  <- read.table(file.choose(), header = T, row.names = 1, sep = '')
+
+#environment
+env <- read.table(file.choose(), header = T, row.names = 1, sep = '')
 
 #exclude unicates
 uni <- apply(spp, 2, sum)

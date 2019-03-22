@@ -1,19 +1,23 @@
-###Analyses of community composition
+#Analyses of community composition
 
-##install packages
-install.packages(vegan)
-install.packages(raster)
+#install packages
+install.packages('vegan')
+install.packages('recluster')
+install.packages('maps')
+install.packages('raster')
 
-##load packages
+#load packages
 require(vegan)
+require(recluster)
+require(maps)
 require(raster)
 
 ##load matrices
 #species-by-site
-spp  <- read.table(file.choose(), header = T, row.names = 1, sep = '')
+spp  <- read.table(file.choose(), header = T, row.names = 1, sep = ',')
 
 #environment
-env <- read.table(file.choose(), header = T, row.names = 1, sep = '')
+env <- read.table(file.choose(), header = T, row.names = 1, sep = ',')
 
 #exclude unicates
 uni <- apply(spp, 2, sum)
@@ -26,38 +30,47 @@ spp.hel <- decostand(spp, 'hel')
 simdiss <- recluster.dist(spp.hel, dist = "simpson")
 
 #ordination analysis
-spp.ord <- metaMDS(simdiss, center = T)$points
-col <- as.data.frame(recluster.col(spp.ord))
+spp.ord <- metaMDS(simdiss, center = T)
 
-#extract colors for plots
-colnames(col) <- c('axis1', 'axis2', 'r', 'g', 'b')
-
-##plot ordination results
-tiff("nmds_map.tiff", height = 15, width = 30, unit = "cm", res = 600)
-par(mfrow = c(1, 2))
-plot(spp.ord, col = rgb(col$r, col$g, col$b, maxColorValue = 255), pch = 16)
-
-#fit environmental vectors
-fit <- envfit(spp.ord, environment)
-plot(fit, add = T, col = 'black')
+#plot ordination results
+plot(spp.ord, display = 'sites', type = 'n')
+points(spp.ord, col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
 
 ##map
-#ll  <- read.table('latlong.txt', header = T, row.names = 1, sep = '')
-
-#load Brazil's shapefile
-#brasil <- shapefile('Brasil')
+#load Brazil's shapefiles
+brasil <- shapefile('Brasil')
 
 #plot geographical delimitation
-map(xlim = c(min(ll$Long10), max(ll$Long10)),
-	ylim = c(min(ll$Lat10), max(ll$Lat10)), col = "white")
+map(xlim = c(-55, -44), ylim = c(-30, -21), col = 'white')
 
 #plot shapefile and points
-plot(brasil, border = 'gray', add = T)
-points(ll$Long10, ll$Lat10, col = rgb(col$r, col$g, col$b,
-	maxColorValue = 255), pch = 16)
-#map.axes()
+plot(brasil, add = T)
+points(cbind(env$Long10, env$Lat10), col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
 
-#fit most explanatory environmental variable
-ordisurf(cbind(ll$Long10, ll$Lat10), environment$bio9, col = 'black', add = T)
+#fit important environmental variables
+ordisurf(cbind(env$Long10, env$Lat10), env$TempSeas, col = 'gray', add = T)
+
+
+##plot in working directory
+tiff('araucaria_forest.tiff', height = 15, width = 30, uni = 'cm', res = 300)
+par(mfrow = c(1,2))
+
+#ordination results
+plot(spp.ord, display = 'sites', type = 'n')
+points(spp.ord, col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
+
+#map
+brasil <- shapefile('Brasil')
+
+#plot geographical delimitation
+map(xlim = c(-55, -44), ylim = c(-30, -21), col = 'white')
+
+#plot shapefile and points
+plot(brasil, add = T)
+points(cbind(env$Long10, env$Lat10), col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
+
+#fit important environmental variables
+ordisurf(cbind(env$Long10, env$Lat10), env$TempSeas, col = 'gray', add = T)
 
 dev.off()
+

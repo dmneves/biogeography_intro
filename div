@@ -92,8 +92,12 @@ varpart(spp.hel, env$Lat10, env$TempSeas)
 ###beta-diversity partitioning
 habitats <- read.table(file.choose(), header = T, row.names = 1, sep = ',')
 
-beta.pair(habitats)
+habitats.beta <- beta.pair(habitats)
 
+#save results to working directory
+write.table(as.matrix(habitats$beta.sor), 'beta_sne.csv')#sorensen dissimilarity
+write.table(as.matrix(habitats$beta.sim), 'beta_sim.csv')#species turnover (simpson dissimilarity)
+write.table(as.matrix(habitats.beta$beta.sne), 'beta_sne.csv')#nestedness (aninhamento)
 
 ###cluster analysis
 habitats.clust <- recluster.cons (habitats, dist = 'simpson', tr = 1000)

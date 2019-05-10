@@ -1,16 +1,18 @@
-#Analyses of community composition
+###Analyses of community composition
 
 #install packages
-install.packages('vegan')
-install.packages('recluster')
+install.packages('betapart')
 install.packages('maps')
 install.packages('raster')
+install.packages('recluster')
+install.packages('vegan')
 
 #load packages
-require(vegan)
-require(recluster)
+require(betapart)
 require(maps)
 require(raster)
+require(recluster)
+require(vegan)
 
 ##load matrices
 #species-by-site
@@ -74,3 +76,18 @@ ordisurf(cbind(env$Long10, env$Lat10), env$TempSeas, col = 'gray', add = T)
 
 dev.off()
 
+
+##variation partitioning
+varpart(spp.hel, env$Lat10, env$TemSeas)
+
+
+###beta-diversity partitioning
+habitats <- read.table(file.choose(), header = T, row.names = 1, sep = ',')
+
+beta.pair(habitats)
+
+
+###cluster analysis
+habitats.clust <- recluster.cons (habitats, dist = 'simpson', tr = 1000)
+
+plot(habitats.clust)

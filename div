@@ -40,6 +40,9 @@ spp.ord <- metaMDS(simdiss, center = T)
 plot(spp.ord, display = 'sites', type = 'n')
 points(spp.ord, col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
 
+legend('topright', c('norte', 'sul'), pch = 16, col = c('red', 'blue'),
+	cex = 2, bty = 'n')
+
 ##map
 #load Brazil's shapefiles
 brasil <- shapefile('Brasil')
@@ -50,9 +53,6 @@ map(xlim = c(-55, -44), ylim = c(-30, -21), col = 'white')
 #plot shapefile and points
 plot(brasil, add = T)
 points(cbind(env$Long10, env$Lat10), col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
-
-legend('topright', c('norte', 'sul'), pch = 16, col = c('red', 'blue'),
-	cex = 2, bty = 'n')
 
 #fit important environmental variables
 ordisurf(cbind(env$Long10, env$Lat10), env$TempSeas, col = 'gray', add = T)
@@ -65,6 +65,9 @@ par(mfrow = c(1,2))
 #ordination results
 plot(spp.ord, display = 'sites', type = 'n')
 points(spp.ord, col = c('red', 'blue')[as.numeric(env$region)], pch = 16)
+
+legend('topright', c('norte', 'sul'), pch = 16, col = c('red', 'blue'),
+	cex = 2, bty = 'n')
 
 #map
 brasil <- shapefile('Brasil')
@@ -83,7 +86,7 @@ dev.off()
 
 
 ##variation partitioning
-varpart(spp.hel, env$Lat10, env$TemSeas)
+varpart(spp.hel, env$Lat10, env$TempSeas)
 
 
 ###beta-diversity partitioning

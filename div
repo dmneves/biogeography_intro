@@ -1,4 +1,4 @@
-###Analyses of community composition
+##Analyses of community composition##
 
 #install packages
 install.packages('betapart')
